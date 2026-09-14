@@ -237,7 +237,7 @@ prepare_extra_common() {
         --enable-{shared,extra-encodings} \
         --with-pic
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/iconv
-    echo "iconv${TARGET_DIR}/lib/libiconv.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "iconv${TARGET_DIR}/lib/libiconv.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -250,7 +250,7 @@ prepare_extra_common() {
         --prefix=${TARGET_DIR} \
         --shared
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/zlib
-    echo "zlib${TARGET_DIR}/lib/libz.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "zlib${TARGET_DIR}/lib/libz.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -266,7 +266,7 @@ prepare_extra_common() {
         --enable-shared \
         --without-python
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/libxml2
-    echo "libxml2${TARGET_DIR}/lib/libxml2.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "libxml2${TARGET_DIR}/lib/libxml2.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -283,7 +283,7 @@ prepare_extra_common() {
     meson configure fribidi_build
     ninja -j$(nproc) -C fribidi_build install
     cp -a ${TARGET_DIR}/lib/libfribidi.so* ${SOURCE_DIR}/fribidi
-    echo "fribidi/libfribidi.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "fribidi/libfribidi.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
 
     # FREETYPE
@@ -297,7 +297,7 @@ prepare_extra_common() {
         --enable-shared \
         --disable-static
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/freetype
-    echo "freetype${TARGET_DIR}/lib/libfreetype.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "freetype${TARGET_DIR}/lib/libfreetype.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -319,7 +319,7 @@ prepare_extra_common() {
     meson configure fontconfig_build
     ninja -j$(nproc) -C fontconfig_build install
     cp -a ${TARGET_DIR}/lib/libfontconfig.so* ${SOURCE_DIR}/fontconfig
-    echo "fontconfig/libfontconfig.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "fontconfig/libfontconfig.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
 
     # HARFBUZZ
@@ -337,7 +337,7 @@ prepare_extra_common() {
     meson configure harfbuzz_build
     ninja -j$(nproc) -C harfbuzz_build install
     cp -a ${TARGET_DIR}/lib/libharfbuzz.so* ${SOURCE_DIR}/harfbuzz
-    echo "harfbuzz/libharfbuzz.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "harfbuzz/libharfbuzz.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
 
     # UNIBREAK
@@ -352,7 +352,7 @@ prepare_extra_common() {
         --disable-static \
         --with-pic
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/libunibreak
-    echo "libunibreak${TARGET_DIR}/lib/libunibreak.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "libunibreak${TARGET_DIR}/lib/libunibreak.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -368,7 +368,7 @@ prepare_extra_common() {
         --enable-{shared,libunibreak} \
         --with-pic
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/libass
-    echo "libass${TARGET_DIR}/lib/libass.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "libass${TARGET_DIR}/lib/libass.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -384,7 +384,7 @@ prepare_extra_common() {
         --enable-shared \
         --with-pic
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/ogg
-    echo "ogg${TARGET_DIR}/lib/libogg.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "ogg${TARGET_DIR}/lib/libogg.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -402,7 +402,7 @@ prepare_extra_common() {
         --enable-shared \
         --with-pic
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/theora
-    echo "theora${TARGET_DIR}/lib/libtheora{enc,dec}.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "theora${TARGET_DIR}/lib/libtheora{enc,dec}.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -430,7 +430,7 @@ prepare_extra_common() {
         --with-combined-threads \
         --with-incoming-stack-boundary=2
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/fftw3
-    echo "fftw3${TARGET_DIR}/lib/libfftw3f.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "fftw3${TARGET_DIR}/lib/libfftw3f.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -452,7 +452,7 @@ prepare_extra_common() {
         -DFFT_LIB=fftw3f \
         ..
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/chromaprint
-    echo "chromaprint${TARGET_DIR}/lib/libchromaprint.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "chromaprint${TARGET_DIR}/lib/libchromaprint.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -464,7 +464,7 @@ prepare_extra_common() {
     ./autogen.sh
     ./configure --prefix=${TARGET_DIR} ${CROSS_OPT}
     make -j $(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/zimg
-    echo "zimg${TARGET_DIR}/lib/libzimg.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "zimg${TARGET_DIR}/lib/libzimg.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -482,7 +482,7 @@ prepare_extra_common() {
     meson configure dav1d_build
     ninja -j$(nproc) -C dav1d_build install
     cp -a ${TARGET_DIR}/lib/libdav1d.so* ${SOURCE_DIR}/dav1d
-    echo "dav1d/libdav1d.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "dav1d/libdav1d.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
 
     # SVT-AV1
@@ -499,7 +499,7 @@ prepare_extra_common() {
         -DBUILD_{TESTING,APPS,DEC}=OFF \
         ..
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/SVT-AV1
-    echo "SVT-AV1${TARGET_DIR}/lib/libSvtAv1Enc.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "SVT-AV1${TARGET_DIR}/lib/libSvtAv1Enc.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -517,7 +517,7 @@ prepare_extra_common() {
         --disable-{static,silent-rules} \
         --prefix=${TARGET_DIR} CFLAGS="-O3 -DNDEBUG" CXXFLAGS="-O3 -DNDEBUG" ${CROSS_OPT}
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/fdk-aac-stripped
-    echo "fdk-aac-stripped${TARGET_DIR}/lib/libfdk-aac.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "fdk-aac-stripped${TARGET_DIR}/lib/libfdk-aac.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -553,8 +553,8 @@ prepare_extra_common() {
     ninja -j$(nproc) -C drm_build install
     cp -a ${TARGET_DIR}/lib/libdrm*.so* ${SOURCE_DIR}/libdrm
     cp ${TARGET_DIR}/share/libdrm/*.ids ${SOURCE_DIR}/libdrm
-    echo "libdrm/libdrm*.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
-    echo "libdrm/*.ids usr/lib/flux-ffmpeg/share/libdrm" >> ${DPKG_INSTALL_LIST}
+    echo "libdrm/libdrm*.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "libdrm/*.ids usr/lib/valence-ffmpeg/share/libdrm" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -567,8 +567,8 @@ prepare_extra_common() {
     else
         libva_drv_arch_path="/usr/lib/x86_64-linux-gnu/dri"
     fi
-    sed -i "s#secure_getenv(\"LIBVA_DRIVERS_PATH\")#\"/usr/lib/flux-ffmpeg/lib/dri:${libva_drv_arch_path}:/usr/lib/dri:/usr/local/lib/dri\"#g" va/va.c
-    sed -i "s#secure_getenv(\"LIBVA_DRIVER_NAME\")#secure_getenv(\"LIBVA_DRIVER_NAME_FLUX\")#g" va/va.c
+    sed -i "s#secure_getenv(\"LIBVA_DRIVERS_PATH\")#\"/usr/lib/valence-ffmpeg/lib/dri:${libva_drv_arch_path}:/usr/lib/dri:/usr/local/lib/dri\"#g" va/va.c
+    sed -i "s#secure_getenv(\"LIBVA_DRIVER_NAME\")#secure_getenv(\"LIBVA_DRIVER_NAME_VALENCE\")#g" va/va.c
     ./autogen.sh
     ./configure \
         ${CROSS_OPT} \
@@ -576,8 +576,8 @@ prepare_extra_common() {
         --enable-drm \
         --disable-{glx,x11,wayland,docs}
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/intel
-    echo "intel${TARGET_DIR}/lib/libva.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
-    echo "intel${TARGET_DIR}/lib/libva-drm.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "intel${TARGET_DIR}/lib/libva.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "intel${TARGET_DIR}/lib/libva-drm.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -590,7 +590,7 @@ prepare_extra_common() {
         ${CROSS_OPT} \
         --prefix=${TARGET_DIR}
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/intel
-    echo "intel${TARGET_DIR}/bin/vainfo usr/lib/flux-ffmpeg" >> ${DPKG_INSTALL_LIST}
+    echo "intel${TARGET_DIR}/bin/vainfo usr/lib/valence-ffmpeg" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -626,7 +626,7 @@ prepare_extra_common() {
         -DBUILD_WSI_{XCB,XLIB,XLIB_XRANDR,WAYLAND}_SUPPORT=OFF ..
     make -j$(nproc) && make install
     cp -a ${TARGET_DIR}/lib/libvulkan.so* ${SOURCE_DIR}/Vulkan-Loader
-    echo "Vulkan-Loader/libvulkan.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "Vulkan-Loader/libvulkan.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -662,7 +662,7 @@ prepare_extra_common() {
     ninja -j$(nproc)
     ninja install
     cp -a ${TARGET_DIR}/lib/libshaderc_shared.so* ${SOURCE_DIR}/shaderc
-    echo "shaderc/libshaderc_shared* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "shaderc/libshaderc_shared* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -682,18 +682,10 @@ prepare_extra_common() {
         pushd ${SOURCE_DIR}
         mkdir mesa
         pushd mesa
-        mesa_ver="mesa-26.0.8"
-        mesa_link="https://gitlab.freedesktop.org/mesa/mesa/-/archive/${mesa_ver}/mesa-${mesa_ver}.tar.gz"
+        mesa_ver="26.0-backport"
+        mesa_link="https://gitlab.freedesktop.org/nyanmisaka/mesa/-/archive/${mesa_ver}/mesa-${mesa_ver}.tar.gz"
         fetch ${mesa_link} mesa.tar.gz
         tar xaf mesa.tar.gz
-        # Enable VAAPI VPP alpha blending support
-        apply_local_patch mesa/41090.patch patch -p1 -d mesa-${mesa_ver}
-        # Fix misc CSC issues in VAAPI VPP
-        apply_local_patch mesa/42181.patch patch -p1 -d mesa-${mesa_ver}
-        # Fix setting VPE rotation with horizontal flip enabled
-        apply_local_patch mesa/42408.patch sh -c "sed 's#/mm/#/#g' | patch -p1 -d mesa-${mesa_ver}"
-        # Fix setting chroma swizzle mode in VK Video on GFX9
-        apply_local_patch mesa/42763.patch patch -p1 -d mesa-${mesa_ver}
         meson setup mesa-${mesa_ver} mesa_build \
             ${MESON_CROSS_OPT} \
             --prefix=${TARGET_DIR} \
@@ -732,12 +724,12 @@ prepare_extra_common() {
         cp -a ${TARGET_DIR}/lib/libvulkan_*.so ${SOURCE_DIR}/mesa
         # radeonsi_drv_video.so -> libgallium_drv_video.so is soft link
         cp ${TARGET_DIR}/lib/dri/radeonsi_drv_video.so ${SOURCE_DIR}/mesa
-        echo "mesa/lib*.so usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
-        echo "mesa/radeonsi_drv_video.so usr/lib/flux-ffmpeg/lib/dri" >> ${DPKG_INSTALL_LIST}
+        echo "mesa/lib*.so usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+        echo "mesa/radeonsi_drv_video.so usr/lib/valence-ffmpeg/lib/dri" >> ${DPKG_INSTALL_LIST}
         cp ${TARGET_DIR}/share/drirc.d/*.conf ${SOURCE_DIR}/mesa
-        echo "mesa/*defaults.conf usr/lib/flux-ffmpeg/share/drirc.d" >> ${DPKG_INSTALL_LIST}
+        echo "mesa/*defaults.conf usr/lib/valence-ffmpeg/share/drirc.d" >> ${DPKG_INSTALL_LIST}
         cp ${TARGET_DIR}/share/vulkan/icd.d/*.json ${SOURCE_DIR}/mesa
-        echo "mesa/*icd.*.json usr/lib/flux-ffmpeg/share/vulkan/icd.d" >> ${DPKG_INSTALL_LIST}
+        echo "mesa/*icd.*.json usr/lib/valence-ffmpeg/share/vulkan/icd.d" >> ${DPKG_INSTALL_LIST}
         popd
         popd
     fi
@@ -763,7 +755,7 @@ prepare_extra_common() {
     meson configure placebo_build
     ninja -j$(nproc) -C placebo_build install
     cp -a ${TARGET_DIR}/lib/libplacebo.so* ${SOURCE_DIR}/libplacebo
-    echo "libplacebo/libplacebo* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "libplacebo/libplacebo* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
 }
 
@@ -794,7 +786,7 @@ prepare_extra_amd64() {
     make -j$(nproc) && make install
     mkdir -p ${SOURCE_DIR}/intel/dri
     cp -a ${TARGET_DIR}/lib/dri/i965*.so ${SOURCE_DIR}/intel/dri
-    echo "intel/dri/i965*.so usr/lib/flux-ffmpeg/lib/dri" >> ${DPKG_INSTALL_LIST}
+    echo "intel/dri/i965*.so usr/lib/valence-ffmpeg/lib/dri" >> ${DPKG_INSTALL_LIST}
     popd
     popd
 
@@ -805,7 +797,7 @@ prepare_extra_amd64() {
     mkdir build && pushd build
     cmake -DCMAKE_INSTALL_PREFIX=${TARGET_DIR} ..
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/intel
-    echo "intel${TARGET_DIR}/lib/libigdgmm.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "intel${TARGET_DIR}/lib/libigdgmm.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -821,7 +813,7 @@ prepare_extra_amd64() {
     apply_local_patch vpl-gpu-rt/e025c82.patch git apply
     # Fix missing entries in PicStruct validation with VPL patch
     apply_local_patch vpl-gpu-rt/c7eb030.patch git apply
-    sed -i 's|MFX_PLUGINS_CONF_DIR "/plugins.cfg"|"/usr/lib/flux-ffmpeg/lib/mfx/plugins.cfg"|g' api/mfx_dispatch/linux/mfxloader.cpp
+    sed -i 's|MFX_PLUGINS_CONF_DIR "/plugins.cfg"|"/usr/lib/valence-ffmpeg/lib/mfx/plugins.cfg"|g' api/mfx_dispatch/linux/mfxloader.cpp
     mkdir build && pushd build
     cmake -DCMAKE_INSTALL_PREFIX=${TARGET_DIR} \
           -DBUILD_RUNTIME=ON \
@@ -829,7 +821,7 @@ prepare_extra_amd64() {
           -DBUILD_TUTORIALS=OFF \
           ..
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/intel
-    echo "intel${TARGET_DIR}/lib/libmfxhw64.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "intel${TARGET_DIR}/lib/libmfxhw64.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -840,7 +832,7 @@ prepare_extra_amd64() {
     pushd ${SOURCE_DIR}
     clone v2.17.0 https://github.com/intel/libvpl.git
     pushd libvpl
-    sed -i 's|ParseEnvSearchPaths(ONEVPL_PRIORITY_PATH_VAR, searchDirList)|searchDirList.push_back("/usr/lib/flux-ffmpeg/lib")|g' libvpl/src/mfx_dispatcher_vpl_loader.cpp
+    sed -i 's|ParseEnvSearchPaths(ONEVPL_PRIORITY_PATH_VAR, searchDirList)|searchDirList.push_back("/usr/lib/valence-ffmpeg/lib")|g' libvpl/src/mfx_dispatcher_vpl_loader.cpp
     mkdir build && pushd build
     cmake -DCMAKE_INSTALL_PREFIX=${TARGET_DIR} \
           -DCMAKE_INSTALL_BINDIR=${TARGET_DIR}/bin \
@@ -853,7 +845,7 @@ prepare_extra_amd64() {
           ..
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/intel
     echo "Libs.private: -lstdc++" >> ${TARGET_DIR}/lib/pkgconfig/vpl.pc
-    echo "intel${TARGET_DIR}/lib/libvpl.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "intel${TARGET_DIR}/lib/libvpl.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -874,7 +866,7 @@ prepare_extra_amd64() {
           -DMFX_ENABLE_{KERNELS,ENCTOOLS,AENC}=ON \
           ..
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/intel
-    echo "intel${TARGET_DIR}/lib/libmfx-gen* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "intel${TARGET_DIR}/lib/libmfx-gen* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -898,10 +890,10 @@ prepare_extra_amd64() {
           LIBVA_DRIVERS_PATH=${TARGET_DIR}/lib/dri \
           ..
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/intel
-    echo "intel${TARGET_DIR}/lib/libigfxcmrt.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "intel${TARGET_DIR}/lib/libigfxcmrt.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     mkdir -p ${SOURCE_DIR}/intel/dri
     cp -a ${TARGET_DIR}/lib/dri/iHD*.so ${SOURCE_DIR}/intel/dri
-    echo "intel/dri/iHD*.so usr/lib/flux-ffmpeg/lib/dri" >> ${DPKG_INSTALL_LIST}
+    echo "intel/dri/iHD*.so usr/lib/valence-ffmpeg/lib/dri" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -923,7 +915,7 @@ prepare_extra_arm() {
         -DBUILD_TEST=OFF \
         ..
     make -j$(nproc) && make install && make install DESTDIR=${SOURCE_DIR}/rkmpp
-    echo "rkmpp${TARGET_DIR}/lib/librockchip_mpp.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "rkmpp${TARGET_DIR}/lib/librockchip_mpp.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
     popd
     popd
@@ -943,7 +935,7 @@ prepare_extra_arm() {
     meson configure rkrga_build
     ninja -j$(nproc) -C rkrga_build install
     cp -a ${TARGET_DIR}/lib/librga.so* ${SOURCE_DIR}/rkrga
-    echo "rkrga/librga.so* usr/lib/flux-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
+    echo "rkrga/librga.so* usr/lib/valence-ffmpeg/lib" >> ${DPKG_INSTALL_LIST}
     popd
 }
 
@@ -1017,5 +1009,5 @@ popd
 
 # Move the artifacts out
 mkdir -p ${ARTIFACT_DIR}/deb
-mv /flux-ffmpeg_* ${ARTIFACT_DIR}/deb/
+mv /valence-ffmpeg_* ${ARTIFACT_DIR}/deb/
 chown -Rc $(stat -c %u:%g ${ARTIFACT_DIR}) ${ARTIFACT_DIR}

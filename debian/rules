@@ -8,7 +8,7 @@ PACKAGE_VERSION := "$(ORIG_VERSION)-$(VERSION_SUFFIX)"
 
 CONFIG := --prefix=${TARGET_DIR} \
 	--target-os=linux \
-	--extra-version=Flux \
+	--extra-version=Valence \
 	--disable-unstable \
 	--disable-doc \
 	--disable-ffplay \

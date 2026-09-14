@@ -1,26 +1,26 @@
-name: '🏗️ Build flux-ffmpeg'
+name: '🏗️ Build valence-ffmpeg'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-# `flux` carries Flux's patches on top of FFmpeg, the way upstream used a branch
+# `valence` carries Valence's patches on top of FFmpeg, the way upstream used a branch
 # named `jellyfin` for theirs. Named for what it holds rather than `main`, which
 # would have read as though it were FFmpeg's own trunk.
 on:
   push:
     branches:
-      - flux
+      - valence
     paths-ignore:
       - '**/*.md'
 
   pull_request:
     branches:
-      - flux
+      - valence
     paths-ignore:
       - '**/*.md'
 
-# Debian and macOS. Upstream also builds Ubuntu and Windows; Flux consumes
+# Debian and macOS. Upstream also builds Ubuntu and Windows; Valence consumes
 # neither, and both are build minutes spent on nothing.
 #
 # macOS is here for a reason the container image cannot cover. VideoToolbox

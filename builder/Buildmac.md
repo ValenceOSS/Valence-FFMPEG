@@ -1,6 +1,6 @@
-# flux-ffmpeg portable versions builder for mac
+# valence-ffmpeg portable versions builder for mac
 
-Portable versions builder of flux-ffmpeg for macOS.
+Portable versions builder of valence-ffmpeg for macOS.
 
 This script is generally made for GitHub Actions' CI runner, and there will be some caveats when running it locally.
 
@@ -10,7 +10,7 @@ A significant limitation is that this script will mutate files in a way that pre
 
 VideoToolbox cannot be passed into a container on macOS. Docker Desktop runs a Linux VM, and so does Apple's own `container` framework; neither exposes the host's VideoToolbox. So anything containerised on a Mac transcodes in software, whatever the hardware underneath, and a Mac that wants its own encoder has to install natively.
 
-Homebrew's ffmpeg is not a substitute. It has `scale_vt`, which is upstream, and none of the VideoToolbox filters this repository patches in — so a Mac running on it burns subtitles and tone maps HDR in system memory. Flux probes the build and picks its route from what it finds, so that is slower rather than broken, but it is slower than the hardware can manage.
+Homebrew's ffmpeg is not a substitute. It has `scale_vt`, which is upstream, and none of the VideoToolbox filters this repository patches in — so a Mac running on it burns subtitles and tone maps HDR in system memory. Valence probes the build and picks its route from what it finds, so that is slower rather than broken, but it is slower than the hardware can manage.
 
 Apple silicon only. `buildmac.sh` still knows how to cross-compile the Intel target, and CI does not ask it to: every VideoToolbox measurement so far is on Apple silicon and there is no Intel Mac to verify against.
 
@@ -50,7 +50,7 @@ Generated artifacts will be stored to `artifacts` folder.
 
 ### Prepare for next running.
 
-To run another clean build, the easiest way is to remove the `FFBUILD_PREFIX` folder, and then remove `flux-ffmpeg` and re-clone the repo.
+To run another clean build, the easiest way is to remove the `FFBUILD_PREFIX` folder, and then remove `valence-ffmpeg` and re-clone the repo.
 
 If you don't want to rebuild all the dependencies, you can keep the `FFBUILD_PREFIX` folder and remove/comment out the following lines:
 
@@ -81,10 +81,10 @@ The artefact is a tarball of two static binaries, so there is nothing to install
 beyond putting them somewhere and saying where:
 
 ```sh
-sudo mkdir -p /usr/local/lib/flux-ffmpeg
-sudo tar -xJf flux-ffmpeg_*_portable_macarm64-gpl.tar.xz -C /usr/local/lib/flux-ffmpeg
-export FLUX_FFMPEG=/usr/local/lib/flux-ffmpeg/ffmpeg
-export FLUX_FFPROBE=/usr/local/lib/flux-ffmpeg/ffprobe
+sudo mkdir -p /usr/local/lib/valence-ffmpeg
+sudo tar -xJf valence-ffmpeg_*_portable_macarm64-gpl.tar.xz -C /usr/local/lib/valence-ffmpeg
+export VALENCE_FFMPEG=/usr/local/lib/valence-ffmpeg/ffmpeg
+export VALENCE_FFPROBE=/usr/local/lib/valence-ffmpeg/ffprobe
 ```
 
 Those two variables are what the transcoder reads; without them it looks for

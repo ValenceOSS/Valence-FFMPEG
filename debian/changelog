@@ -1,3 +1,37 @@
+valence-ffmpeg (8.1.2-5.1) unstable; urgency=medium
+
+  * Renamed from flux-ffmpeg. The build was named before the project was, and
+    the name reached the package, the install prefix, the libva driver override
+    and the version every machine reports. All of them are Valence now.
+  * Merged jellyfin-ffmpeg 8.1.2-3 through 8.1.2-5, which is where everything
+    below this entry comes from.
+
+ -- Valence <noreply@valence.dev>  Mon, 14 Sep 2026 20:13:21 +0100
+
+jellyfin-ffmpeg (8.1.2-5) unstable; urgency=medium
+
+  * Make HDR10+ removal more precise
+  * Sync some fixes for ac4dec
+  * Fix QSV AV1 decoder exporting HDR side data
+  * Fix using hwmap with swscale unstable
+
+ -- nyanmisaka <nst799610810@gmail.com>  Wed, 9 Sep 2026 17:31:57 +0800
+
+jellyfin-ffmpeg (8.1.2-4) unstable; urgency=medium
+
+  * Fix AMD hevc_vaapi encoder extradata with overrides
+  * Drop support for EOL Debian Bullseye (old old stable)
+
+ -- nyanmisaka <nst799610810@gmail.com>  Thu, 3 Sep 2026 12:38:02 +0800
+
+jellyfin-ffmpeg (8.1.2-3) unstable; urgency=medium
+
+  * Update backported vulkan fixes from upstream
+  * Polish some DX11-OCL sharing patches
+  * Update fixes for relaxing safe filenames in mkv attachments
+  * Backport a fix to not stall sub2video on stream EOF
+
+ -- nyanmisaka <nst799610810@gmail.com>  Wed, 12 Aug 2026 17:23:38 +0800
 flux-ffmpeg (8.1.2-2flux2) unstable; urgency=medium
 
   * Build for macOS on Apple silicon, publishing a portable tarball beside the

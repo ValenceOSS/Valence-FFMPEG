@@ -93,7 +93,7 @@ fi
     $FFBUILD_TARGET_FLAGS \
     --host-cflags="$FF_HOST_CFLAGS" \
     --host-ldflags="$FF_HOST_LDFLAGS" \
-    --extra-version="Flux" \
+    --extra-version="Valence" \
     --extra-cflags="$FF_CFLAGS" \
     --extra-cxxflags="$FF_CXXFLAGS" \
     --extra-ldflags="$FF_LDFLAGS" \
@@ -109,12 +109,12 @@ make -j"$(sysctl -n hw.ncpu)" V=1
 # We have to manually match lines to get version as there will be no dpkg-parsechangelog on macOS
 #
 # Matching `jellyfin-ffmpeg` here no longer picked the top entry, because the
-# changelog keeps upstream's history below Flux's own. It matched the newest
+# changelog keeps upstream's history below Valence's own. It matched the newest
 # *Jellyfin* entry instead and stamped the artefact 8.1.2-2 -- a real version,
 # just not this one, which is the kind of wrong that survives review.
 PKG_VER=0.0.0
 while IFS= read -r line; do
-    if [[ $line == flux-ffmpeg* ]]; then
+    if [[ $line == valence-ffmpeg* ]]; then
         if [[ $line =~ \(([^\)]+)\) ]]; then
             PKG_VER="${BASH_REMATCH[1]}"
             break
@@ -122,7 +122,7 @@ while IFS= read -r line; do
     fi
 done < "$BUILDER_ROOT"/../debian/changelog
 
-PKG_NAME="flux-ffmpeg_${PKG_VER}_portable_${TARGET}-${VARIANT}${ADDINS_STR:+-}${ADDINS_STR}"
+PKG_NAME="valence-ffmpeg_${PKG_VER}_portable_${TARGET}-${VARIANT}${ADDINS_STR:+-}${ADDINS_STR}"
 ARTIFACTS_PATH="$BUILDER_ROOT"/artifacts
 OUTPUT_FNAME="${PKG_NAME}.tar.xz"
 cd "$BUILDER_ROOT"

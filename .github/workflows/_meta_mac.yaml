@@ -10,7 +10,7 @@ jobs:
   build:
     name: 'Build Portable FFmpeg'
     # No matrix. Upstream built x86_64 and arm64, cross-compiling the Intel one
-    # from the same arm64 runner. Flux builds Apple silicon only: every
+    # from the same arm64 runner. Valence builds Apple silicon only: every
     # VideoToolbox measurement so far is on Apple silicon and there is no Intel
     # Mac to verify against, so an Intel artefact would ship unexercised.
     #
