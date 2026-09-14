@@ -1,9 +1,0 @@
-ffmpeg usr/lib/flux-ffmpeg
-ffprobe usr/lib/flux-ffmpeg
-libavcodec/libavcodec.so* usr/lib/flux-ffmpeg/lib
-libavdevice/libavdevice.so* usr/lib/flux-ffmpeg/lib
-libavfilter/libavfilter.so* usr/lib/flux-ffmpeg/lib
-libavformat/libavformat.so* usr/lib/flux-ffmpeg/lib
-libavutil/libavutil.so* usr/lib/flux-ffmpeg/lib
-libswresample/libswresample.so* usr/lib/flux-ffmpeg/lib
-libswscale/libswscale.so* usr/lib/flux-ffmpeg/lib

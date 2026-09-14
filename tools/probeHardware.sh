@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 # Reports what a machine's video hardware can actually do, using the same
-# ffmpeg, the same render node and the same probe arguments as Flux's media
-# service. Run it on a host with a GPU, either inside the Flux image or against
-# a plain Debian container that has installed the flux-ffmpeg deb.
+# ffmpeg, the same render node and the same probe arguments as Valence's media
+# service. Run it on a host with a GPU, either inside the Valence image or against
+# a plain Debian container that has installed the valence-ffmpeg deb.
 #
-# It lives here rather than in Flux because Flux is private, and this has to be
+# It lives here rather than in Valence because Valence is private, and this has to be
 # reachable from a machine with no checkout — a NAS with a Dockge panel and a
 # graphics card in it. See tools/compose.probe.yml.
 #
@@ -16,8 +16,8 @@
 # stop this script, not decorate it.
 set -euo pipefail
 
-FFMPEG="${FLUX_FFMPEG:-/usr/lib/flux-ffmpeg/ffmpeg}"
-DEVICE="${FLUX_VAAPI_DEVICE:-/dev/dri/renderD128}"
+FFMPEG="${VALENCE_FFMPEG:-/usr/lib/valence-ffmpeg/ffmpeg}"
+DEVICE="${VALENCE_VAAPI_DEVICE:-/dev/dri/renderD128}"
 
 # Matches PROBE_SIZE in apps/transcoder/src/capability.rs. Kept in step by hand,
 # because a probe that passes here and fails in the service is worse than no
@@ -36,7 +36,7 @@ require_executable() {
 
   if [ ! -x "$path" ]; then
     printf 'cannot run: %s is not executable\n' "$path" >&2
-    printf 'set %s to the ffmpeg this image ships, or run inside the Flux image\n' "$variable" >&2
+    printf 'set %s to the ffmpeg this image ships, or run inside the Valence image\n' "$variable" >&2
     exit 1
   fi
 }
@@ -100,11 +100,11 @@ probe_encoder() {
   printf '  %-14s FAILS — %s\n' "$encoder" "$(last_line "$complaint")"
 }
 
-require_executable "$FFMPEG" FLUX_FFMPEG
+require_executable "$FFMPEG" VALENCE_FFMPEG
 
 heading 'the card, and the render node the transcoder will open'
 ls -l /dev/dri || printf 'no /dev/dri — pass the device through\n'
-printf '\nFLUX_VAAPI_DEVICE=%s\n' "$DEVICE"
+printf '\nVALENCE_VAAPI_DEVICE=%s\n' "$DEVICE"
 
 if [ ! -e "$DEVICE" ]; then
   printf 'that node does not exist, so every VAAPI result below is meaningless\n' >&2
@@ -221,7 +221,7 @@ fi
 # with nothing changed between the runs. A single pass cannot tell "this works"
 # from "this works two times in three", and the difference decides whether the
 # route is shippable.
-CHAIN_ATTEMPTS="${FLUX_CHAIN_ATTEMPTS:-5}"
+CHAIN_ATTEMPTS="${VALENCE_CHAIN_ATTEMPTS:-5}"
 
 probe_chain() {
   local label="$1"
@@ -254,7 +254,7 @@ probe_chain() {
   printf '  %-34s FAILS  0/%d — %s\n' "$label" "$CHAIN_ATTEMPTS" "$(last_line "$complaint")"
 }
 
-# A build either has a filter or it does not, and Flux probes for exactly these
+# A build either has a filter or it does not, and Valence probes for exactly these
 # before choosing a route. Reporting them separately means a missing filter
 # reads as "not compiled in" rather than as a broken chain further down.
 heading 'the filters each route needs'
@@ -264,7 +264,7 @@ for filter in scale_vaapi overlay_vaapi tonemap_vaapi; do
   if printf '%s\n' "$LISTED_FILTERS" | grep -qx "$filter"; then
     printf '  %-16s present\n' "$filter"
   else
-    printf '  %-16s MISSING — Flux falls back for anything needing it\n' "$filter"
+    printf '  %-16s MISSING — Valence falls back for anything needing it\n' "$filter"
   fi
 done
 
@@ -278,7 +278,7 @@ if [ ! -s "$SAMPLE" ]; then
   printf '  no sample to work from, so nothing here was tested\n'
 else
   SUBTITLES="$WORKSPACE/subs.srt"
-  printf '1\n00:00:00,000 --> 00:00:10,000\nFlux burns this in on the device\n' >"$SUBTITLES"
+  printf '1\n00:00:00,000 --> 00:00:10,000\nValence burns this in on the device\n' >"$SUBTITLES"
 
   TEXT_SAMPLE="$WORKSPACE/text.mkv"
 
@@ -349,7 +349,7 @@ else
   printf '  could not build an HDR sample, so tone mapping was not tested\n'
 fi
 
-# The chains above ask what the hardware can do. This asks what Flux will
+# The chains above ask what the hardware can do. This asks what Valence will
 # decide about it, by running the probe the service runs — tone_map_probe_
 # arguments in apps/transcoder/src/capability.rs, kept in step with this by
 # hand like the rest.
@@ -357,8 +357,8 @@ fi
 # Worth reporting separately because the two answers differ on purpose. A card
 # that cannot tone map is not a fault to fix; it is a machine that converts HDR
 # in software, which is what every machine did until recently. What would be a
-# fault is Flux believing otherwise, and this is the line that says which.
-heading 'what Flux will conclude about tone mapping'
+# fault is Valence believing otherwise, and this is the line that says which.
+heading 'what Valence will conclude about tone mapping'
 
 if printf '%s\n' "$LISTED_FILTERS" | grep -qx tonemap_vaapi; then
   # Which half failed. The probe uploads a ten-bit frame and then tone maps it,

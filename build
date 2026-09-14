@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 usage() {
-    echo -e "Build Flux FFmpeg deb packages"
+    echo -e "Build Valence FFmpeg deb packages"
     echo -e " $0 <release> <arch>"
     echo -e "Releases:          Arches:"
-    echo -e " * bullseye         * amd64"
-    echo -e " * bookworm         * arm64"
-    echo -e " * trixie"
+    echo -e " * bookworm         * amd64"
+    echo -e " * trixie           * arm64"
     echo -e " * jammy"
     echo -e " * noble"
     echo -e " * resolute"
@@ -19,12 +18,6 @@ fi
 
 cli_release="${1}"
 case ${cli_release} in
-    'bullseye')
-        release="debian:bullseye"
-        gcc_ver="10"
-        llvm_ver="16"
-        llvmspirvlib_ver="11"
-    ;;
     'bookworm')
         release="debian:bookworm"
         gcc_ver="12"
@@ -91,7 +84,7 @@ for dep in ${container_cmd} make mmv; do
     command -v "${dep}" &>/dev/null || { echo "The command '${dep}' is required."; exit 1; }
 done
 
-image_name="flux-ffmpeg-build-${cli_release}"
+image_name="valence-ffmpeg-build-${cli_release}"
 package_temporary_dir="$( mktemp -d )"
 
 # Sources fetched by the build, kept between runs.

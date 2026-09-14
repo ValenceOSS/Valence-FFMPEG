@@ -3,7 +3,7 @@
 #
 #   docker compose -f compose.probe.yml run --rm probe
 #
-# Installs the flux-ffmpeg release deb into a plain Debian container, fetches
+# Installs the valence-ffmpeg release deb into a plain Debian container, fetches
 # probeHardware.sh from this repository, and runs it against the card.
 #
 # The script is fetched rather than inlined. Inlining meant restating two
@@ -19,27 +19,27 @@ services:
       # The release whose deb gets probed. Must be a published release, not a
       # branch build: workflow artifacts need credentials this container has not
       # got.
-      VERSION: ${VERSION:-8.1.2-2flux1}
+      VERSION: ${VERSION:-8.1.2-5.1}
       SUITE: ${SUITE:-bookworm}
       ARCH: ${ARCH:-amd64}
       # Which revision of the probe to run. A branch moves under you; prefer a
       # tag or a commit SHA once one contains the script.
-      PROBE_REF: ${PROBE_REF:-flux}
-      FLUX_VAAPI_DEVICE: ${FLUX_VAAPI_DEVICE:-/dev/dri/renderD128}
+      PROBE_REF: ${PROBE_REF:-valence}
+      VALENCE_VAAPI_DEVICE: ${VALENCE_VAAPI_DEVICE:-/dev/dri/renderD128}
     entrypoint: ['/bin/bash', '-euo', 'pipefail', '-c']
     command:
       - |
-        DEB="flux-ffmpeg_$${VERSION}-$${SUITE}_$${ARCH}.deb"
-        BASE=https://github.com/MarquesCoding/flux-ffmpeg
-        RAW=https://raw.githubusercontent.com/MarquesCoding/flux-ffmpeg
+        DEB="valence-ffmpeg_$${VERSION}-$${SUITE}_$${ARCH}.deb"
+        BASE=https://github.com/ValenceOSS/valence-ffmpeg
+        RAW=https://raw.githubusercontent.com/ValenceOSS/valence-ffmpeg
 
         export DEBIAN_FRONTEND=noninteractive
         apt-get update -qq
         apt-get install -y -qq --no-install-recommends ca-certificates curl pciutils >/dev/null
 
         echo "=== installing $${DEB} ==="
-        curl -fsSL --retry 5 -o /tmp/flux.deb "$${BASE}/releases/download/v$${VERSION}/$${DEB}"
-        apt-get install -y -qq --no-install-recommends /tmp/flux.deb >/dev/null
+        curl -fsSL --retry 5 -o /tmp/valence.deb "$${BASE}/releases/download/v$${VERSION}/$${DEB}"
+        apt-get install -y -qq --no-install-recommends /tmp/valence.deb >/dev/null
 
         echo "=== fetching probeHardware.sh @ $${PROBE_REF} ==="
         curl -fsSL --retry 5 -o /tmp/probe.sh "$${RAW}/$${PROBE_REF}/tools/probeHardware.sh"

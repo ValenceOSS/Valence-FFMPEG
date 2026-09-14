@@ -1,4 +1,4 @@
-name: '🚀 Build and Publish flux-ffmpeg'
+name: '🚀 Build and Publish valence-ffmpeg'
 
 on:
   release:
@@ -8,7 +8,7 @@ on:
 
 # Upstream also pushed the built packages into repo.jellyfin.org over ssh. Those
 # steps and the three secrets they needed are gone: the packages are attached to
-# the GitHub release instead, which is what Flux's Dockerfile installs from and
+# the GitHub release instead, which is what Valence's Dockerfile installs from and
 # needs no credentials at all.
 jobs:
   build_publish_debian:

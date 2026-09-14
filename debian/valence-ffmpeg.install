@@ -1,0 +1,9 @@
+ffmpeg usr/lib/valence-ffmpeg
+ffprobe usr/lib/valence-ffmpeg
+libavcodec/libavcodec.so* usr/lib/valence-ffmpeg/lib
+libavdevice/libavdevice.so* usr/lib/valence-ffmpeg/lib
+libavfilter/libavfilter.so* usr/lib/valence-ffmpeg/lib
+libavformat/libavformat.so* usr/lib/valence-ffmpeg/lib
+libavutil/libavutil.so* usr/lib/valence-ffmpeg/lib
+libswresample/libswresample.so* usr/lib/valence-ffmpeg/lib
+libswscale/libswscale.so* usr/lib/valence-ffmpeg/lib
