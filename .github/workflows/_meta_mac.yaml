@@ -8,14 +8,29 @@ on:
 
 jobs:
   build:
-    name: 'Build Portable FFmpeg'
-    # No matrix. Upstream built x86_64 and arm64, cross-compiling the Intel one
-    # from the same arm64 runner. Valence builds Apple silicon only: every
-    # VideoToolbox measurement so far is on Apple silicon and there is no Intel
-    # Mac to verify against, so an Intel artefact would ship unexercised.
+    name: 'Build Portable FFmpeg (${{ matrix.target }})'
+    # Both Mac targets, from one arm64 runner. Upstream did the same: the Intel
+    # build is cross-compiled rather than needing an Intel machine, and
+    # variants/defaults-mac.sh already carries the whole of that path -- it
+    # reads the builder's own architecture, and on an arm64 builder making a
+    # mac64 target it adds `-arch x86_64`, `--enable-cross-compile --arch=x86_64`
+    # and CMAKE_OSX_ARCHITECTURES, with a meson cross file beside it.
     #
-    # buildmac.sh still knows how to produce it. Passing `x86_64` here is all it
-    # would take, if a machine to test it on ever turns up.
+    # This built Apple silicon alone until now, because an Intel artefact nobody
+    # had run would ship unexercised at exactly the machine most likely to
+    # receive it -- an Intel Mac mini is a common thing to retire into a media
+    # server. That is still true of the *artefact*, which is why the Intel one
+    # is built and checked here but is not evidence on its own: what the runner
+    # can prove is that it compiled and that it is Intel, and a real Intel Mac
+    # has to prove the filters run. See VAL-110.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: macarm64
+            arch: arm64
+          - target: mac64
+            arch: x86_64
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -56,7 +71,7 @@ jobs:
           [[ "${arch}" == "arm64" ]]
 
       - name: Build Portable
-        run: ./builder/buildmac.sh arm64
+        run: ./builder/buildmac.sh ${{ matrix.arch }}
 
       # Proves the point of the target rather than trusting that a green build
       # meant the patches applied. A quilt step that applies nothing still
@@ -72,7 +87,44 @@ jobs:
       # from the list. All three are upstream -- 0045 replaces transpose_vt's
       # implementation without registering it -- so Homebrew's build has them
       # too and they would pass whether or not a patch applied.
+      # The cross-compiled binary cannot be run here. It is x86_64 and the runner
+      # is arm64, and Rosetta is not something to depend on being installed on a
+      # CI image. So the architecture is asserted instead, which is the half of
+      # this that a runner can answer: a build that silently came out arm64
+      # under the mac64 name is the failure worth catching, and it is exactly
+      # what would happen if the cross-compile branch in defaults-mac.sh ever
+      # stopped firing.
+      - name: Verify the build is for the target it claims
+        run: |
+          set -euo pipefail
+          archs="$(lipo -archs ./builder/ffmpeg)"
+          echo "built for: ${archs}"
+          case "${{ matrix.target }}" in
+              macarm64) [[ "${archs}" == *arm64* ]] ;;
+              mac64)    [[ "${archs}" == *x86_64* ]] ;;
+          esac
+
+      # Proves the point of the target rather than trusting that a green build
+      # meant the patches applied. A quilt step that applies nothing still
+      # produces a working ffmpeg -- just a stock one -- so the build going
+      # green is not evidence of the thing this target is for.
+      #
+      # These three and only these three, because each is registered in
+      # allfilters.c by a patch rather than existing upstream: overlay by 0044,
+      # tonemap by 0046, bwdif by 0056. So none of them can be present unless
+      # the series applied.
+      #
+      # scale_vt, transpose_vt and yadif_videotoolbox are deliberately absent
+      # from the list. All three are upstream -- 0045 replaces transpose_vt's
+      # implementation without registering it -- so Homebrew's build has them
+      # too and they would pass whether or not a patch applied.
+      #
+      # Only for the native target. The patch series is one series and applies
+      # to both, so proving it on the build that can be run here proves it for
+      # the other -- what the Intel build still owes is that the filters *run*
+      # on Intel hardware, which no runner can answer and a real Mac must.
       - name: Verify the VideoToolbox filters are in the build
+        if: matrix.target == 'macarm64'
         run: |
           set -euo pipefail
           ./builder/ffmpeg -hide_banner -version
@@ -91,7 +143,7 @@ jobs:
       - name: Upload Artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: mac-arm64-portable
+          name: ${{ matrix.target }}-portable
           path: ./builder/artifacts
 
   publish:
@@ -101,10 +153,14 @@ jobs:
     needs:
       - build
     steps:
+      # Both targets, merged into one directory. `pattern` with `merge-multiple`
+      # rather than naming one artifact, so a target added to the matrix is
+      # published without a second change here.
       - name: Download Artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: mac-arm64-portable
+          pattern: mac*-portable
+          merge-multiple: true
           path: artifact
 
       # Upstream also pushed these to repo.jellyfin.org over ssh. Same reasoning
