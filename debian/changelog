@@ -1,3 +1,16 @@
+valence-ffmpeg (8.1.2-5.2) unstable; urgency=medium
+
+  * Publish the Intel Mac build. The target was turned on in CI three days
+    after 8.1.2-5.1 was cut, so it has been built and never released. It is
+    cross-compiled on an Apple silicon runner beside macarm64.
+  * Measured on an Intel Mac before being offered: a 2015 MacBook Pro with
+    Iris Pro 5200, on macOS 12.7.6. The patched VideoToolbox filters run
+    there -- tonemap_videotoolbox converts an HDR frame and
+    overlay_videotoolbox composites on the hardware -- on a chip a
+    generation before Intel had HEVC at all.
+
+ -- Valence <noreply@valence.dev>  Fri, 18 Sep 2026 15:10:00 +0100
+
 valence-ffmpeg (8.1.2-5.1) unstable; urgency=medium
 
   * Renamed from flux-ffmpeg. The build was named before the project was, and
