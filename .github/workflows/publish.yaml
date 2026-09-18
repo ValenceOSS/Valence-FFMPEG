@@ -24,7 +24,7 @@ jobs:
       architectures: '["amd64", "arm64"]'
       release: true
 
-  # Apple silicon only, and a portable tarball rather than a package. The two
+  # Both Mac architectures, and a portable tarball rather than a package. The two
   # binaries are static, so installing is an untar and a path; neither a signed
   # .pkg nor a Homebrew tap buys enough over that to be worth a Developer ID
   # certificate or a second repository to hold a formula.
