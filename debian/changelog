@@ -1,3 +1,17 @@
+valence-ffmpeg (8.1.2-5.3) unstable; urgency=medium
+
+  * Complete the sync with jellyfin-ffmpeg 8.1.2-5. 8.1.2-5.1 merged
+    upstream a day before 8.1.2-5 was tagged, and missed what went in
+    after it:
+    - Fix potential RADV hang with linear images on ARM64.
+    - Fix the hard cap on frame pool size for D3D11 hwctx.
+    - Sync fixes for the RK3588 pipeline from ffmpeg-rockchip.
+    - Fix the FATE references for mapped hwframe conversion.
+  * Build the Mac targets with Homebrew's own nasm, as upstream now does,
+    rather than nasm 2 from a third-party tap.
+
+ -- Valence <noreply@valence.dev>  Thu, 24 Sep 2026 14:00:00 +0100
+
 valence-ffmpeg (8.1.2-5.2) unstable; urgency=medium
 
   * Publish the Intel Mac build. The target was turned on in CI three days
@@ -27,6 +41,8 @@ jellyfin-ffmpeg (8.1.2-5) unstable; urgency=medium
   * Sync some fixes for ac4dec
   * Fix QSV AV1 decoder exporting HDR side data
   * Fix using hwmap with swscale unstable
+  * Fix potential RADV hang with linear images on ARM64
+  * Fix the hard cap on frame pool size for D3D11 hwctx
 
  -- nyanmisaka <nst799610810@gmail.com>  Wed, 9 Sep 2026 17:31:57 +0800
 
