@@ -9,8 +9,14 @@ valence-ffmpeg (8.1.2-5.3) unstable; urgency=medium
     - Fix the FATE references for mapped hwframe conversion.
   * Build the Mac targets with Homebrew's own nasm, as upstream now does,
     rather than nasm 2 from a third-party tap.
+  * Keep a keyframe's display time when movenc moves its decode time
+    forward (9001, the fork's first patch of its own). Some HEVC WEBDL
+    matroska files give the frame before a keyframe a two-frame duration;
+    remuxed to HLS fMP4, the keyframe lost its whole reorder delay and was
+    shown 167ms early at most segment starts, which players showed as a skip
+    or a stale frame. Streams that never reach that branch are unchanged.
 
- -- Valence <noreply@valence.dev>  Thu, 24 Sep 2026 14:00:00 +0100
+ -- Valence <noreply@valence.dev>  Thu, 01 Oct 2026 14:00:00 +0100
 
 valence-ffmpeg (8.1.2-5.2) unstable; urgency=medium
 
