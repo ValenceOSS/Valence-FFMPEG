@@ -1,0 +1,34 @@
+Keep a packet's presentation time when movenc moves its decode time forward.
+
+check_pkt() moves a packet whose decode time is earlier than the end of the
+previous sample to just after it, and until now also threw the packet's
+presentation time away. A sample with no presentation time is then given its
+decode time instead, so a frame shown after it is decoded loses its whole
+reorder delay and is presented early, over the frames before it.
+
+In fragmented output this happens whenever a fragment's last sample says it
+lasts longer than it really does: its end is taken from AVPacket.duration, so
+the next fragment's first sample looks as though it goes backwards. Matroska
+files that give the frame before a keyframe a two-frame BlockDuration do this
+at every keyframe, and an HLS fMP4 remux of them shows a keyframe four frames
+early at most segment starts, which players present as a skip or a stale frame.
+
+Keep the presentation time whenever it is still at or after the corrected
+decode time, which is all a sample needs. Only when it would now come before
+it is it dropped as before. Nothing changes for a stream that never takes
+this branch.
+
+Index: FFmpeg/libavformat/movenc.c
+===================================================================
+--- FFmpeg.orig/libavformat/movenc.c
++++ FFmpeg/libavformat/movenc.c
+@@ -6742,7 +6742,8 @@
+                duration, pkt->dts, pkt->stream_index);
+ 
+         pkt->dts = ref + 1;
+-        pkt->pts = AV_NOPTS_VALUE;
++        if (pkt->pts != AV_NOPTS_VALUE && pkt->pts < pkt->dts)
++            pkt->pts = AV_NOPTS_VALUE;
+     }
+ 
+     if (pkt->duration < 0 || pkt->duration > INT_MAX) {
