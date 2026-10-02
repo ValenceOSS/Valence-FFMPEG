@@ -20,6 +20,11 @@ jobs:
     #
     # win64 only. Upstream also built Windows on Arm, which Valence ships no transcoder for.
     runs-on: windows-latest
+    # Read only, and the checkout's token not left behind. Every dependency is fetched and built
+    # here by makepkg, and none of that needs the write access publish.yaml grants this workflow
+    # for the job that attaches the zip to a release.
+    permissions:
+      contents: read
     defaults:
       run:
         shell: msys2 {0}
@@ -40,6 +45,8 @@ jobs:
             mingw-w64-clang-x86_64-nasm
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       # FFBUILD_PREFIX in msys2/build.sh. Every dependency installs here.
       - name: Prepare prefix dir
