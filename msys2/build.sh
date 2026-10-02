@@ -28,9 +28,11 @@ done
 
 cd "$BUILDER_ROOT"
 cd ..
+# Not by linking debian/patches to ./patches, as upstream did: this repository keeps its own
+# patches/ directory for the libraries the Debian build patches, so the link lands inside it and
+# fails. QUILT_PATCHES points quilt at the series without touching the tree, as buildmac.sh does.
 if [[ -f "debian/patches/series" ]]; then
-    ln -s debian/patches patches
-    quilt push -a
+    QUILT_PATCHES=debian/patches quilt push -a
 fi
 
 # On Windows, included headers are usually case-insensitive:
