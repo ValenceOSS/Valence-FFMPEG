@@ -1,3 +1,17 @@
+valence-ffmpeg (8.1.2-5.4) unstable; urgency=medium
+
+  * Publish a Windows build again, for Valence's transcoder running natively
+    on Windows (VAL-338), where Docker Desktop passes NVIDIA's encoder into a
+    container and nothing of Intel's or AMD's. It is upstream's msys2 clang
+    build: static, ffmpeg.exe and ffprobe.exe alone, with libvpl, AMF, NVENC,
+    Direct3D 11 and 12, OpenCL, Vulkan and libplacebo. win64 only.
+  * Apply the Windows build's patches through QUILT_PATCHES, as the Mac
+    build does, since this repository's own patches/ directory took the
+    name upstream linked debian/patches to.
+  * No change to the Debian or Mac builds.
+
+ -- Valence <noreply@valence.dev>  Fri, 02 Oct 2026 09:00:00 +0100
+
 valence-ffmpeg (8.1.2-5.3) unstable; urgency=medium
 
   * Complete the sync with jellyfin-ffmpeg 8.1.2-5. 8.1.2-5.1 merged
