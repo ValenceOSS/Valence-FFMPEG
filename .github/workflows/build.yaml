@@ -20,8 +20,8 @@ on:
     paths-ignore:
       - '**/*.md'
 
-# Debian and macOS. Upstream also builds Ubuntu and Windows; Valence consumes
-# neither, and both are build minutes spent on nothing.
+# Debian, macOS and Windows. Upstream also builds Ubuntu, which Valence does not
+# consume, and those are build minutes spent on nothing.
 #
 # macOS is here for a reason the container image cannot cover. VideoToolbox
 # cannot be passed into a container on a Mac -- Docker Desktop runs a Linux VM
@@ -39,5 +39,14 @@ jobs:
 
   build_macos:
     uses: ./.github/workflows/_meta_mac.yaml
+    with:
+      release: false
+
+  # Windows for the same reason as macOS, one step removed. Docker Desktop on
+  # Windows passes NVIDIA's encoder into a container and nothing of Intel's or
+  # AMD's, so a Windows PC that wants QuickSync or AMF has to run Valence's
+  # transcoder natively, and a native install needs a build. See VAL-338.
+  build_windows:
+    uses: ./.github/workflows/_meta_windows.yaml
     with:
       release: false

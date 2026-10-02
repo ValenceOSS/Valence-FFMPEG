@@ -34,3 +34,13 @@ jobs:
     uses: ./.github/workflows/_meta_mac.yaml
     with:
       release: true
+
+  # Windows, as a portable zip of two static executables, for the native
+  # transcoder Valence ships for Windows. Unsigned, like the Mac tarballs: the
+  # transcoder's own release is what a person downloads, and it carries these.
+  build_publish_windows:
+    permissions:
+      contents: write
+    uses: ./.github/workflows/_meta_windows.yaml
+    with:
+      release: true

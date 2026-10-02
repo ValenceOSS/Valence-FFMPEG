@@ -46,8 +46,8 @@ PKG_CONFIG_PATH=/clang64/ffbuild/lib/pkgconfig ./configure \
     --pkg-config-flags=--static \
     --extra-cflags=-I/clang64/ffbuild/include \
     --extra-ldflags=-L/clang64/ffbuild/lib \
-    --prefix=/clang64/ffbuild/jellyfin-ffmpeg \
-    --extra-version=Jellyfin \
+    --prefix=/clang64/ffbuild/valence-ffmpeg \
+    --extra-version=Valence \
     --disable-unstable \
     --disable-ffplay \
     --disable-debug \
@@ -102,9 +102,13 @@ PKG_CONFIG_PATH=/clang64/ffbuild/lib/pkgconfig ./configure \
 make -j$(nproc) V=1
 
 # We have to manually match lines to get version as there will be no dpkg-parsechangelog on msys2
+#
+# Matching `valence-ffmpeg` rather than upstream's `jellyfin-ffmpeg`, for the reason buildmac.sh
+# gives: the changelog keeps upstream's history below Valence's own, and the Jellyfin match picks
+# the newest Jellyfin entry, stamping the artefact with a real version that is not this one.
 PKG_VER=0.0.0
 while IFS= read -r line; do
-    if [[ $line == jellyfin-ffmpeg* ]]; then
+    if [[ $line == valence-ffmpeg* ]]; then
         if [[ $line =~ \(([^\)]+)\) ]]; then
             PKG_VER="${BASH_REMATCH[1]}"
             break
@@ -112,7 +116,7 @@ while IFS= read -r line; do
     fi
 done < "$BUILDER_ROOT"/../debian/changelog
 
-PKG_NAME="jellyfin-ffmpeg_${PKG_VER}_portable_${TARGET}-${VARIANT}${ADDINS_STR:+-}${ADDINS_STR}"
+PKG_NAME="valence-ffmpeg_${PKG_VER}_portable_${TARGET}-${VARIANT}${ADDINS_STR:+-}${ADDINS_STR}"
 ARTIFACTS_PATH="$BUILDER_ROOT"/artifacts
 OUTPUT_FNAME="${PKG_NAME}.zip"
 cd "$BUILDER_ROOT"
