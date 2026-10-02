@@ -97,6 +97,12 @@ package_temporary_dir="$( mktemp -d )"
 source_cache_dir="${SOURCE_CACHE_DIR:-$( pwd )/.sources}"
 mkdir -p "${source_cache_dir}"
 
+# Compiled objects, kept the same way: CI restores this directory from actions/cache, and the
+# build compiles through ccache into it, so a dependency whose source has not changed is not
+# compiled again. A local build accumulates one too.
+ccache_dir="${CCACHE_HOST_DIR:-$( pwd )/.ccache}"
+mkdir -p "${ccache_dir}"
+
 # Trap cleanup for latter sections
 cleanup() {
     # Clean up the Dockerfile
@@ -111,7 +117,7 @@ make -f Dockerfile.make DISTRO=${release} GCC_VER=${gcc_ver} LLVM_VER=${llvm_ver
 # Set up the build environment docker image
 ${container_cmd} build . -t "${image_name}"
 # Build the APKs and copy out to ${package_temporary_dir}
-${container_cmd} run --rm -e "RELEASE=${release}" -v "${package_temporary_dir}:/dist" -v "${source_cache_dir}:/sources" "${image_name}"
+${container_cmd} run --rm -e "RELEASE=${release}" -v "${package_temporary_dir}:/dist" -v "${source_cache_dir}:/sources" -v "${ccache_dir}:/ccache" "${image_name}"
 # If no 3rd parameter was specified, move APKs to parent directory
 if [[ -z ${3} ]]; then
     path="../bin"

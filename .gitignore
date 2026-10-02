@@ -3,6 +3,7 @@
 # docker-build.sh through the mount set up in `build`, and restored from
 # actions/cache in CI. Nothing here belongs in the repository.
 /.sources/
+/.ccache/
 
 # quilt's record of which patches it has applied, left in the tree by a local
 # macOS build. The Debian build never creates it here, because it patches inside

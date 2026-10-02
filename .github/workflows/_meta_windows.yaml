@@ -30,6 +30,7 @@ jobs:
         shell: msys2 {0}
     steps:
       - uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2
+        id: msys2
         with:
           update: true
           msystem: CLANG64
@@ -50,9 +51,25 @@ jobs:
 
       # FFBUILD_PREFIX in msys2/build.sh. Every dependency installs here.
       - name: Prepare prefix dir
-        run: mkdir /clang64/ffbuild
+        run: mkdir -p /clang64/ffbuild
+
+      # The dependencies FFmpeg links, built into that prefix, kept between runs. Building them
+      # was about an hour and a half of every run, and they change only when msys2/PKGBUILD does;
+      # a hit leaves FFmpeg itself as the whole build.
+      #
+      # Saved only by a run that succeeded, so a half-built prefix is never kept. Bump the
+      # trailing number to throw it away, for instance after an msys2 toolchain update leaves the
+      # cached libraries out of step with the compiler.
+      - name: Cache the built dependencies
+        id: deps
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ steps.msys2.outputs.msys2-location }}\clang64\ffbuild
+          key: win64-deps-${{ hashFiles('msys2/PKGBUILD/**') }}-1
 
       - name: Build Portable
+        env:
+          DEPS_CACHED: ${{ steps.deps.outputs.cache-hit }}
         run: ./msys2/build.sh
 
       # Proves the build has what Valence's Windows pipelines name, rather than trusting that a

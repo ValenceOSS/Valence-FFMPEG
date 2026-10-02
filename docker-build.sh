@@ -50,6 +50,18 @@ FETCH_WAIT=20
 # the network exactly as before.
 SOURCE_CACHE="${SOURCE_CACHE:-/sources}"
 
+# Compiles go through ccache where the build was given somewhere to keep it, which CI restores
+# between runs. Called once the toolchain is in place, so the cross compilers an arm64 build
+# installs get a ccache link of their own. 700 MB each, so the four jobs' caches and the others
+# this repository keeps stay inside GitHub's 10 GB.
+enable_ccache() {
+    [[ -d /ccache ]] && command -v ccache &>/dev/null || return 0
+    update-ccache-symlinks
+    export CCACHE_DIR=/ccache CCACHE_MAXSIZE=700M CCACHE_COMPRESS=1 CCACHE_BASEDIR="${SOURCE_DIR}"
+    export PATH="/usr/lib/ccache:${PATH}"
+    ccache --zero-stats
+}
+
 cache_ready() {
     [[ -d "${SOURCE_CACHE}" ]]
 }
@@ -206,6 +218,7 @@ apply_local_patch() {
 
 # Prepare common extra libs for amd64 and arm64
 prepare_extra_common() {
+    enable_ccache
     case ${ARCH} in
         'amd64')
             CROSS_PREFIX_OPT=""
@@ -1006,6 +1019,12 @@ yes | mk-build-deps -i ${DEP_ARCH_OPT}
 dpkg-buildpackage -b -rfakeroot -us -uc ${BUILD_ARCH_OPT}
 
 popd
+
+# How much the cache saved, in the job's own log.
+if [[ -d /ccache ]] && command -v ccache &>/dev/null; then
+    ccache --show-stats
+    chown -R $(stat -c %u:%g ${ARTIFACT_DIR}) /ccache
+fi
 
 # Move the artifacts out
 mkdir -p ${ARTIFACT_DIR}/deb

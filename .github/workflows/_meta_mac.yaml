@@ -70,7 +70,21 @@ jobs:
           echo "runner architecture: ${arch}"
           [[ "${arch}" == "arm64" ]]
 
+      # The dependencies FFmpeg links, built into the prefix, kept between runs for each target.
+      # They are most of a build and change only when their scripts do; a hit leaves FFmpeg
+      # itself, while Homebrew's toolchain is still set up fresh every time.
+      #
+      # Saved only by a run that succeeded. Bump the trailing number to throw it away.
+      - name: Cache the built dependencies
+        id: deps
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: /opt/ffbuild/prefix
+          key: ${{ matrix.target }}-deps-${{ hashFiles('builder/scripts.d/**', 'builder/images/macos/**', 'builder/variants/defaults-mac.sh', 'builder/variants/mac*-gpl.sh') }}-1
+
       - name: Build Portable
+        env:
+          DEPS_CACHED: ${{ steps.deps.outputs.cache-hit }}
         run: ./builder/buildmac.sh ${{ matrix.arch }}
 
       # Proves the point of the target rather than trusting that a green build

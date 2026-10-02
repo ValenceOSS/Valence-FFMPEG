@@ -67,6 +67,17 @@ jobs:
           restore-keys: |
             sources-${{ matrix.arch }}-
 
+      # Compiled objects, kept between runs through ccache. A rolling cache: each run saves under
+      # its own key and the next restores the newest, so what changed is compiled and nothing
+      # else is. Keyed by release and arch because each compiles with its own toolchain.
+      - name: Cache compiled objects
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .ccache
+          key: ccache-${{ matrix.release }}-${{ matrix.arch }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ matrix.release }}-${{ matrix.arch }}-
+
       - name: Build Linux
         run: ./build ${{ matrix.release }} ${{ matrix.arch }} dist
 
@@ -75,7 +86,7 @@ jobs:
       # that otherwise succeeded.
       - name: Make the source cache readable
         if: always()
-        run: sudo chown -R "$(id -u):$(id -g)" .sources
+        run: sudo chown -R "$(id -u):$(id -g)" .sources .ccache
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
