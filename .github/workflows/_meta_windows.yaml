@@ -33,6 +33,7 @@ jobs:
             curl
             wget
             zip
+            unzip
             mingw-w64-clang-x86_64-toolchain
             quilt
             diffstat
