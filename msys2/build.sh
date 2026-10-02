@@ -14,17 +14,20 @@ mkdir -p /clang64/ffbuild/lib
 cp /clang64/lib/libc++.a /clang64/ffbuild/lib/libc++.a
 cp /clang64/lib/libunwind.a /clang64/ffbuild/lib/libunwind.a
 
-cd "$BUILDER_ROOT"/PKGBUILD
-for pkg in *; do
-    if [ -d "$pkg" ]; then
-        echo "Installing $pkg"
-        cd "$pkg"
+# Skipped where CI restored the prefix they build into, which is the whole of the dependencies.
+if [[ "${DEPS_CACHED:-}" != "true" ]]; then
+    cd "$BUILDER_ROOT"/PKGBUILD
+    for pkg in *; do
+        if [ -d "$pkg" ]; then
+            echo "Installing $pkg"
+            cd "$pkg"
 
-        (MINGW_ARCH=clang64 makepkg-mingw -sLfi --noconfirm --skippgpcheck) || exit $?
+            (MINGW_ARCH=clang64 makepkg-mingw -sLfi --noconfirm --skippgpcheck) || exit $?
 
-        cd ..
-      fi
-done
+            cd ..
+          fi
+    done
+fi
 
 cd "$BUILDER_ROOT"
 cd ..

@@ -65,13 +65,17 @@ for macbase in images/macos/*.sh; do
     ffbuild_macbase || exit $?
 done
 
-cd "$BUILDER_ROOT"
-for lib in scripts.d/*.sh; do
-    cd "$BUILDER_ROOT"/build
-    source "$BUILDER_ROOT"/"$lib"
-    ffbuild_enabled || continue
-    ffbuild_dockerbuild || exit $?
-done
+# Skipped where CI restored the prefix they build into, which is the whole of the dependencies.
+# The toolchain above is not: it is Homebrew's, and installed fresh on every runner.
+if [[ "${DEPS_CACHED:-}" != "true" ]]; then
+    cd "$BUILDER_ROOT"
+    for lib in scripts.d/*.sh; do
+        cd "$BUILDER_ROOT"/build
+        source "$BUILDER_ROOT"/"$lib"
+        ffbuild_enabled || continue
+        ffbuild_dockerbuild || exit $?
+    done
+fi
 
 cd "$BUILDER_ROOT"
 cd ..
