@@ -46,6 +46,8 @@ jobs:
   # Windows passes NVIDIA's encoder into a container and nothing of Intel's or
   # AMD's, so a Windows PC that wants QuickSync or AMF has to run Valence's
   # transcoder natively, and a native install needs a build. See VAL-338.
+  # Both x64 and Windows on Arm, whose Qualcomm GPU only a native build can
+  # reach through Media Foundation. See VAL-355.
   build_windows:
     uses: ./.github/workflows/_meta_windows.yaml
     with:

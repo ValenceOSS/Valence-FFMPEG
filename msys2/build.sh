@@ -2,27 +2,57 @@
 set -xe
 cd "$(dirname "$0")"
 export BUILDER_ROOT="$(pwd)"
-export FFBUILD_PREFIX="/clang64/ffbuild"
 export CMAKE_POLICY_VERSION_MINIMUM="3.5"
 
-arch="x86_64"
-TARGET="win64-clang"
+# One script for both Windows targets, told apart by the msys2 environment it runs in: CLANG64 on an
+# x64 runner, CLANGARM64 on an ARM64 one. Upstream kept a second script for Windows on Arm, which
+# had already drifted from this one by the time it was put back, so the differences live here.
+#
+# AMF and libvpl are x64 only. AMD and Intel ship no ARM64 runtime for either, and there is no AMD or
+# Intel graphics in a Windows on Arm machine to drive; there, D3D11VA decodes and Media Foundation
+# encodes, which is how a Qualcomm GPU is reached. NVENC stays: ffnvcodec's ARM64 patch loads the
+# driver's ARM64 entry point, for NVIDIA's own Arm PCs.
+case "${MSYSTEM:-}" in
+    CLANG64)
+        MINGW_PREFIX_DIR="/clang64"
+        ARCH_FLAGS=()
+        VENDOR_FLAGS=(--enable-amf --enable-libvpl)
+        SKIPPED_PKGS=()
+        TARGET="win64-clang"
+        ;;
+    CLANGARM64)
+        MINGW_PREFIX_DIR="/clangarm64"
+        ARCH_FLAGS=(--arch=arm64)
+        VENDOR_FLAGS=()
+        SKIPPED_PKGS=(50-mingw-w64-amf-headers 50-mingw-w64-libvpl)
+        TARGET="winarm64-clang"
+        ;;
+    *)
+        echo "Run this from msys2's CLANG64 or CLANGARM64 environment, not '${MSYSTEM:-none}'." >&2
+        exit 1
+        ;;
+esac
+
+MINGW_ARCH="${MSYSTEM,,}"
+export FFBUILD_PREFIX="${MINGW_PREFIX_DIR}/ffbuild"
 VARIANT="gpl"
 
 # Copy libc++ & libunwind to our prefix folder
-mkdir -p /clang64/ffbuild/lib
-cp /clang64/lib/libc++.a /clang64/ffbuild/lib/libc++.a
-cp /clang64/lib/libunwind.a /clang64/ffbuild/lib/libunwind.a
+mkdir -p "$FFBUILD_PREFIX"/lib
+cp "$MINGW_PREFIX_DIR"/lib/libc++.a "$FFBUILD_PREFIX"/lib/libc++.a
+cp "$MINGW_PREFIX_DIR"/lib/libunwind.a "$FFBUILD_PREFIX"/lib/libunwind.a
 
 # Skipped where CI restored the prefix they build into, which is the whole of the dependencies.
 if [[ "${DEPS_CACHED:-}" != "true" ]]; then
     cd "$BUILDER_ROOT"/PKGBUILD
     for pkg in *; do
-        if [ -d "$pkg" ]; then
+        if [[ " ${SKIPPED_PKGS[*]} " == *" $pkg "* ]]; then
+            echo "Skipping $pkg, which nothing in this target's build links"
+        elif [ -d "$pkg" ]; then
             echo "Installing $pkg"
             cd "$pkg"
 
-            (MINGW_ARCH=clang64 makepkg-mingw -sLfi --noconfirm --skippgpcheck) || exit $?
+            (MINGW_ARCH="$MINGW_ARCH" makepkg-mingw -sLfi --noconfirm --skippgpcheck) || exit $?
 
             cd ..
           fi
@@ -45,13 +75,14 @@ if [[ -f "VERSION" && -f "ffbuild/version.sh" ]]; then
     sed -i "s/cat VERSION/&.bak/g" ffbuild/version.sh
 fi
 
-PKG_CONFIG_PATH=/clang64/ffbuild/lib/pkgconfig ./configure \
+PKG_CONFIG_PATH="$FFBUILD_PREFIX"/lib/pkgconfig ./configure \
     --cc=clang \
     --cxx=clang++ \
+    "${ARCH_FLAGS[@]}" \
     --pkg-config-flags=--static \
-    --extra-cflags=-I/clang64/ffbuild/include \
-    --extra-ldflags=-L/clang64/ffbuild/lib \
-    --prefix=/clang64/ffbuild/valence-ffmpeg \
+    --extra-cflags=-I"$FFBUILD_PREFIX"/include \
+    --extra-ldflags=-L"$FFBUILD_PREFIX"/lib \
+    --prefix="$FFBUILD_PREFIX"/valence-ffmpeg \
     --extra-version=Valence \
     --disable-unstable \
     --disable-ffplay \
@@ -95,8 +126,7 @@ PKG_CONFIG_PATH=/clang64/ffbuild/lib/pkgconfig ./configure \
     --enable-d3d11va \
     --enable-d3d12va \
     --enable-mediafoundation \
-    --enable-amf \
-    --enable-libvpl \
+    "${VENDOR_FLAGS[@]}" \
     --enable-ffnvcodec \
     --enable-cuda \
     --enable-cuda-llvm \
