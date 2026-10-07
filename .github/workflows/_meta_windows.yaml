@@ -161,14 +161,19 @@ jobs:
           cd msys2/artifacts
           unzip -o -q ./*.zip
           mkdir -p smoke
-          ./ffmpeg.exe -hide_banner -loglevel error -f lavfi -i testsrc2=size=1280x720:rate=24:duration=4 \
+          ./ffmpeg.exe -hide_banner -loglevel warning -f lavfi -i testsrc2=size=1280x720:rate=24:duration=4 \
               -f lavfi -i sine=frequency=440:duration=4 \
               -c:v libx264 -preset veryfast -c:a aac -f hls -hls_time 2 -hls_playlist_type vod \
               smoke/index.m3u8
-          ./ffprobe.exe -hide_banner -loglevel error -show_entries stream=codec_name -of csv=p=0 \
-              smoke/index.m3u8 | tr -d '\r' | sort | tr '\n' ' ' | grep -qx 'aac h264 '
+          ls smoke
+          # ffprobe lists a playlist's streams twice, once under its program and once each, with a
+          # blank line between, so they are de-duplicated before being compared.
+          streams="$(./ffprobe.exe -hide_banner -loglevel warning -show_entries stream=codec_name \
+              -of csv=p=0 smoke/index.m3u8 | tr -d '\r' | sed '/^$/d' | sort -u | paste -sd ' ' -)"
+          echo "streams: ${streams}"
+          [[ "$streams" == "aac h264" ]]
           echo "software transcode: ok"
-          if ./ffmpeg.exe -hide_banner -loglevel error -f lavfi -i testsrc2=size=1280x720:rate=24:duration=2 \
+          if ./ffmpeg.exe -hide_banner -loglevel warning -f lavfi -i testsrc2=size=1280x720:rate=24:duration=2 \
               -c:v h264_mf -f mp4 smoke/mf.mp4; then
               echo "h264_mf: encoded $(./ffprobe.exe -v error -count_frames -select_streams v:0 \
                   -show_entries stream=nb_read_frames -of csv=p=0 smoke/mf.mp4 | tr -d '\r') frames"
