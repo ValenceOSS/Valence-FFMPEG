@@ -1,3 +1,23 @@
+valence-ffmpeg (8.1.2-5.5) unstable; urgency=medium
+
+  * Publish a Windows on Arm build again (winarm64), for Valence's
+    transcoder running natively on Snapdragon and other ARM64 PCs
+    (VAL-355). It is built natively on GitHub's ARM64 Windows runner in
+    msys2's CLANGARM64 environment, static like win64. AMF and libvpl are
+    left out, since neither vendor has an ARM64 runtime; D3D11VA decodes
+    and Media Foundation encodes, which is how a Qualcomm GPU is reached.
+    NVENC stays, for NVIDIA's Arm PCs.
+  * Build both Windows targets from one build.sh, taking its paths from
+    MSYSTEM, in place of upstream's separate buildarm64.sh.
+  * Install the dependencies' build tools when their built prefix comes
+    from the cache. A cache hit skipped them, and configure then found
+    nothing; no run had hit the cache before.
+  * Check every Windows build for h264_mf and hevc_mf, and transcode a
+    test pattern to HLS with it before publishing.
+  * No change to the Debian, Mac or win64 builds.
+
+ -- Valence <noreply@valence.dev>  Wed, 07 Oct 2026 17:00:00 +0100
+
 valence-ffmpeg (8.1.2-5.4) unstable; urgency=medium
 
   * Publish a Windows build again, for Valence's transcoder running natively
