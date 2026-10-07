@@ -52,12 +52,19 @@ SOURCE_CACHE="${SOURCE_CACHE:-/sources}"
 
 # Compiles go through ccache where the build was given somewhere to keep it, which CI restores
 # between runs. Called once the toolchain is in place, so the cross compilers an arm64 build
-# installs get a ccache link of their own. 700 MB each, so the four jobs' caches and the others
-# this repository keeps stay inside GitHub's 10 GB.
+# installs get a ccache link of their own.
+#
+# Sized for what each architecture compiles. arm64's dependencies fit in about 50 MB. amd64 also
+# builds Mesa's Intel and AMD drivers and Intel's media stack, and at the 700 MB both once shared
+# it filled every run and evicted as it went: 1,769 cleanups and a 9% hit rate, so the cache saved
+# almost nothing. Both amd64 caches together, with everything else this repository keeps, stay
+# inside GitHub's 10 GB.
 enable_ccache() {
     [[ -d /ccache ]] && command -v ccache &>/dev/null || return 0
     update-ccache-symlinks
-    export CCACHE_DIR=/ccache CCACHE_MAXSIZE=700M CCACHE_COMPRESS=1 CCACHE_BASEDIR="${SOURCE_DIR}"
+    local size=700M
+    [[ "${ARCH}" = "amd64" ]] && size=3G
+    export CCACHE_DIR=/ccache CCACHE_MAXSIZE="${size}" CCACHE_COMPRESS=1 CCACHE_BASEDIR="${SOURCE_DIR}"
     export PATH="/usr/lib/ccache:${PATH}"
     ccache --zero-stats
 }
