@@ -35,8 +35,8 @@ jobs:
     with:
       release: true
 
-  # Windows, as a portable zip of two static executables, for the native
-  # transcoder Valence ships for Windows. Unsigned, like the Mac tarballs: the
+  # Windows, x64 and ARM64, as a portable zip of two static executables each,
+  # for the native transcoder Valence ships for Windows. Unsigned, like the Mac tarballs: the
   # transcoder's own release is what a person downloads, and it carries these.
   build_publish_windows:
     permissions:

@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: 'Build Portable FFmpeg (win64)'
+    name: 'Build Portable FFmpeg (${{ matrix.arch }})'
     # Upstream's clang build, the one jellyfin-ffmpeg published for Windows, put back for the
     # Windows half of VAL-338. Inside Docker Desktop a Windows PC reaches NVIDIA's encoder and
     # nothing of Intel's or AMD's, so Valence's transcoder runs natively there, and a native install
@@ -18,8 +18,34 @@ jobs:
     # Upstream kept both and disabled the cross build once this one was stable; this one is static,
     # so the artefact is ffmpeg.exe and ffprobe.exe and nothing beside them.
     #
-    # win64 only. Upstream also built Windows on Arm, which Valence ships no transcoder for.
-    runs-on: windows-latest
+    # Windows on Arm too, for VAL-355: natively on GitHub's ARM64 runner, as upstream built it. Under
+    # x64 emulation a Snapdragon PC transcodes slower and cannot reach its own encoder, which Media
+    # Foundation is the only way into.
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: win64
+            runner: windows-latest
+            msystem: CLANG64
+            packages: >-
+              mingw-w64-clang-x86_64-toolchain
+              mingw-w64-clang-x86_64-nasm
+            filters: vpp_qsv overlay_qsv vpp_amf scale_cuda tonemap_cuda overlay_cuda scale_d3d11 subtitles zscale libplacebo
+            encoders: h264_qsv hevc_qsv av1_qsv h264_amf hevc_amf av1_amf h264_nvenc hevc_nvenc av1_nvenc h264_mf hevc_mf libx264 libx265 libsvtav1
+            hwaccels: d3d11va qsv cuda
+          # No QSV or AMF: neither vendor ships an ARM64 runtime, and no Windows on Arm machine has
+          # their graphics. Media Foundation's encoders are what a Qualcomm GPU encodes through.
+          - arch: winarm64
+            runner: windows-11-arm
+            msystem: CLANGARM64
+            packages: >-
+              mingw-w64-clang-aarch64-toolchain
+              mingw-w64-clang-aarch64-nasm
+            filters: scale_cuda tonemap_cuda overlay_cuda scale_d3d11 subtitles zscale libplacebo
+            encoders: h264_nvenc hevc_nvenc av1_nvenc h264_mf hevc_mf libx264 libx265 libsvtav1
+            hwaccels: d3d11va cuda
     # Read only, and the checkout's token not left behind. Every dependency is fetched and built
     # here by makepkg, and none of that needs the write access publish.yaml grants this workflow
     # for the job that attaches the zip to a release.
@@ -33,17 +59,16 @@ jobs:
         id: msys2
         with:
           update: true
-          msystem: CLANG64
+          msystem: ${{ matrix.msystem }}
           install: >-
             git
             curl
             wget
             zip
             unzip
-            mingw-w64-clang-x86_64-toolchain
             quilt
             diffstat
-            mingw-w64-clang-x86_64-nasm
+            ${{ matrix.packages }}
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -51,7 +76,7 @@ jobs:
 
       # FFBUILD_PREFIX in msys2/build.sh. Every dependency installs here.
       - name: Prepare prefix dir
-        run: mkdir -p /clang64/ffbuild
+        run: mkdir -p "/${MSYSTEM,,}/ffbuild"
 
       # The dependencies FFmpeg links, built into that prefix, kept between runs. Building them
       # was about an hour and a half of every run, and they change only when msys2/PKGBUILD does;
@@ -64,8 +89,8 @@ jobs:
         id: deps
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: ${{ steps.msys2.outputs.msys2-location }}\clang64\ffbuild
-          key: win64-deps-${{ hashFiles('msys2/PKGBUILD/**') }}-1
+          path: ${{ steps.msys2.outputs.msys2-location }}\${{ matrix.arch == 'winarm64' && 'clangarm64' || 'clang64' }}\ffbuild
+          key: ${{ matrix.arch }}-deps-${{ hashFiles('msys2/PKGBUILD/**') }}-1
 
       - name: Build Portable
         env:
@@ -80,6 +105,10 @@ jobs:
       # Presence only. The runner has no GPU, so whether a filter runs on a given card is the
       # transcoder's own startup check to answer, on that card.
       - name: Verify the hardware filters and encoders are in the build
+        env:
+          FILTERS: ${{ matrix.filters }}
+          ENCODERS: ${{ matrix.encoders }}
+          HWACCELS: ${{ matrix.hwaccels }}
         run: |
           set -euo pipefail
           cd msys2/artifacts
@@ -91,7 +120,7 @@ jobs:
           encoders="$(./ffmpeg.exe -hide_banner -encoders | tr -d '\r')"
           hwaccels="$(./ffmpeg.exe -hide_banner -hwaccels | tr -d '\r')"
           missing=0
-          for filter in vpp_qsv overlay_qsv vpp_amf scale_cuda tonemap_cuda overlay_cuda scale_d3d11 subtitles zscale libplacebo; do
+          for filter in $FILTERS; do
               if grep -qE "^ *[TSC.]+ +${filter} " <<< "$filters"; then
                   echo "filter present: ${filter}"
               else
@@ -99,7 +128,7 @@ jobs:
                   missing=1
               fi
           done
-          for encoder in h264_qsv hevc_qsv av1_qsv h264_amf hevc_amf av1_amf h264_nvenc hevc_nvenc av1_nvenc libx264 libx265 libsvtav1; do
+          for encoder in $ENCODERS; do
               if grep -qE "^ *[A-Z.]+ +${encoder} " <<< "$encoders"; then
                   echo "encoder present: ${encoder}"
               else
@@ -107,7 +136,7 @@ jobs:
                   missing=1
               fi
           done
-          for hwaccel in d3d11va qsv cuda; do
+          for hwaccel in $HWACCELS; do
               if grep -qx "${hwaccel}" <<< "$hwaccels"; then
                   echo "hwaccel present: ${hwaccel}"
               else
@@ -118,10 +147,45 @@ jobs:
           rm -f ffmpeg.exe ffprobe.exe
           exit "$missing"
 
+      # The runner has no GPU, so this is the software path Valence falls back to, run for real: a
+      # transcode to H.264 in HLS segments, read back by ffprobe. On ARM64 it is the one proof the
+      # build runs natively at all, and not just that it linked.
+      #
+      # Then Media Foundation's H.264 encoder, which on a machine with no GPU is Microsoft's
+      # software encoder behind the same interface. It shows the encoder Valence picks on a
+      # Qualcomm GPU opens and encodes on this build; a runner image without it is a notice, not a
+      # failure, since the hardware it stands in for is not here to test either.
+      - name: Transcode with it
+        run: |
+          set -euo pipefail
+          cd msys2/artifacts
+          unzip -o -q ./*.zip
+          mkdir -p smoke
+          ./ffmpeg.exe -hide_banner -loglevel warning -f lavfi -i testsrc2=size=1280x720:rate=24:duration=4 \
+              -f lavfi -i sine=frequency=440:duration=4 \
+              -c:v libx264 -preset veryfast -c:a aac -f hls -hls_time 2 -hls_playlist_type vod \
+              smoke/index.m3u8
+          ls smoke
+          # ffprobe lists a playlist's streams twice, once under its program and once each, with a
+          # blank line between, so they are de-duplicated before being compared.
+          streams="$(./ffprobe.exe -hide_banner -loglevel warning -show_entries stream=codec_name \
+              -of csv=p=0 smoke/index.m3u8 | tr -d '\r' | sed '/^$/d' | sort -u | paste -sd ' ' -)"
+          echo "streams: ${streams}"
+          [[ "$streams" == "aac h264" ]]
+          echo "software transcode: ok"
+          if ./ffmpeg.exe -hide_banner -loglevel warning -f lavfi -i testsrc2=size=1280x720:rate=24:duration=2 \
+              -c:v h264_mf -f mp4 smoke/mf.mp4; then
+              echo "h264_mf: encoded $(./ffprobe.exe -v error -count_frames -select_streams v:0 \
+                  -show_entries stream=nb_read_frames -of csv=p=0 smoke/mf.mp4 | tr -d '\r') frames"
+          else
+              echo "::notice::h264_mf could not open an encoder on this runner."
+          fi
+          rm -rf smoke ffmpeg.exe ffprobe.exe
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: win64-portable
+          name: ${{ matrix.arch }}-portable
           path: ./msys2/artifacts
 
   publish:
@@ -134,7 +198,8 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: win64-portable
+          pattern: 'win*-portable'
+          merge-multiple: true
           path: artifact
 
       - name: Upload GH Release Assets
