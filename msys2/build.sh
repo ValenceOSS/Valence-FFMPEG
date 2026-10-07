@@ -57,6 +57,27 @@ if [[ "${DEPS_CACHED:-}" != "true" ]]; then
             cd ..
           fi
     done
+else
+    # The prefix comes back from the cache, but what makepkg installed from msys2's own repositories
+    # to build it does not: it lives in the environment, not the prefix. pkg-config is among it, and
+    # without it configure finds none of the libraries the cache did restore. So those are installed
+    # here as makepkg's --syncdeps would have, from each package's own lists, leaving out the ones
+    # this repository builds.
+    repo_deps=()
+    for pkg in "$BUILDER_ROOT"/PKGBUILD/*/; do
+        pkg="$(basename "$pkg")"
+        if [[ " ${SKIPPED_PKGS[*]} " == *" $pkg "* ]]; then
+            continue
+        fi
+        while IFS= read -r dep; do
+            dep="${dep%%[<>=]*}"
+            if [[ -n "$dep" && "$dep" != *-jellyfin-* ]]; then
+                repo_deps+=("$dep")
+            fi
+        done < <(bash -c 'source "$1" > /dev/null 2>&1; printf "%s\n" "${depends[@]}" "${makedepends[@]}"' _ "$BUILDER_ROOT/PKGBUILD/$pkg/PKGBUILD")
+    done
+    mapfile -t repo_deps < <(printf '%s\n' "${repo_deps[@]}" | sort -u)
+    pacman -S --needed --noconfirm "${repo_deps[@]}"
 fi
 
 cd "$BUILDER_ROOT"
