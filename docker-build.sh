@@ -490,7 +490,7 @@ prepare_extra_common() {
 
     # DAV1D
     pushd ${SOURCE_DIR}
-    clone 1.5.3 https://code.videolan.org/videolan/dav1d.git
+    clone 1.5.4 https://code.videolan.org/videolan/dav1d.git
     meson setup dav1d dav1d_build \
         ${MESON_CROSS_OPT} \
         --prefix=${TARGET_DIR} \
@@ -507,7 +507,7 @@ prepare_extra_common() {
 
     # SVT-AV1
     pushd ${SOURCE_DIR}
-    clone v4.1.0 https://gitlab.com/AOMediaCodec/SVT-AV1.git
+    clone v4.2.0-cqp-extended https://gitlab.com/AOMediaCodec/SVT-AV1.git
     pushd SVT-AV1
     mkdir build
     pushd build
@@ -812,7 +812,7 @@ prepare_extra_amd64() {
 
     # GMMLIB
     pushd ${SOURCE_DIR}
-    clone intel-gmmlib-22.10.0 https://github.com/intel/gmmlib.git
+    clone intel-gmmlib-22.10.2 https://github.com/intel/gmmlib.git
     pushd gmmlib
     mkdir build && pushd build
     cmake -DCMAKE_INSTALL_PREFIX=${TARGET_DIR} ..
@@ -873,7 +873,7 @@ prepare_extra_amd64() {
     # VPL-GPU-RT (RT only)
     # Provides VPL runtime (libmfx-gen.so.1.2) for 11th Gen Tiger Lake and newer
     pushd ${SOURCE_DIR}
-    clone intel-onevpl-26.2.4 https://github.com/intel/vpl-gpu-rt.git
+    clone intel-onevpl-26.3.5 https://github.com/intel/vpl-gpu-rt.git
     pushd vpl-gpu-rt
     # Fix missing entries in PicStruct validation
     apply_local_patch vpl-gpu-rt/c7eb030.patch git apply
@@ -895,12 +895,10 @@ prepare_extra_amd64() {
     # Full Feature Build: ENABLE_KERNELS=ON(Default) ENABLE_NONFREE_KERNELS=ON(Default)
     # Free Kernel Build: ENABLE_KERNELS=ON ENABLE_NONFREE_KERNELS=OFF
     pushd ${SOURCE_DIR}
-    clone intel-media-26.2.4 https://github.com/intel/media-driver.git
+    clone intel-media-26.3.5 https://github.com/intel/media-driver.git
     pushd media-driver
     # Enable VC1 decode on DG2 (note that MTL+ is not supported)
     apply_local_patch media-driver/e47702f.patch git apply
-    # Fix iHD crashes when used with Xe KMD on small BAR systems
-    apply_local_patch media-driver/6fd4037.patch git apply
     mkdir build && pushd build
     cmake -DCMAKE_INSTALL_PREFIX=${TARGET_DIR} \
           -DCMAKE_C_FLAGS="${CFLAGS} -Wno-error=array-bounds" \

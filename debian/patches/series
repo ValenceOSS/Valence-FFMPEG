@@ -74,7 +74,7 @@
 0074-fix-mapped-hwframe-to-swframe-swscale-conversion.patch
 0075-fix-hwupload-filter-cannot-use-devices-created-by-hwaccel.patch
 0076-fix-seeking-h264-open-gop-videos-with-d3d11va-on-amd.patch
-0077-fix-readrate-catchup-caused-remuxing-to-stall.patch
+0077-suppress-the-resumed-reading-at-pts-with-rate-warning.patch
 0078-backport-fixes-for-vulkan-from-upstream.patch
 0079-add-fixes-for-vaapi-drm-prime-vulkan-interop.patch
 0080-prefer-vulkan-device-with-higher-api-version.patch
@@ -98,4 +98,6 @@
 0098-backport-a-fix-to-not-stall-sub2video-on-stream-eof.patch
 0099-fix-qsv-av1-decoder-exporting-hdr-side-data.patch
 0100-backport-trim-bitstream-filter.patch
+0101-fix-videotoolbox-closed-caption-sei.patch
 9001-keep-a-keyframes-display-time-when-movenc-nudges-its-decode-time.patch
+9002-use-a-dolby-vision-scenes-l0-peak-when-its-l1-peak-is-too-dark.patch
