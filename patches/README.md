@@ -26,7 +26,6 @@ point at. Vendoring pins the contents as well as removing the fetch.
 | Patch | Upstream | Fixes |
 | -- | -- | -- |
 | `mediasdk/8fb9f5f.patch` | [Intel-Media-SDK/MediaSDK@8fb9f5f](https://github.com/Intel-Media-SDK/MediaSDK/commit/8fb9f5f) | Build under gcc 13 |
-| `media-driver/6fd4037.patch` | [intel/media-driver@6fd4037](https://github.com/intel/media-driver/commit/6fd4037) | iHD crashes with Xe KMD on small BAR systems |
 | `media-driver/e47702f.patch` | [intel/media-driver@e47702f](https://github.com/intel/media-driver/commit/e47702f) | VC1 decode on DG2 |
 | `vpl-gpu-rt/c7eb030.patch` | [intel/vpl-gpu-rt@c7eb030](https://github.com/intel/vpl-gpu-rt/commit/c7eb030) | Missing entries in PicStruct validation |
 | `vpl-gpu-rt/e025c82.patch` | [intel/vpl-gpu-rt@e025c82](https://github.com/intel/vpl-gpu-rt/commit/e025c82) | ADI issue |

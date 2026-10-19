@@ -1,3 +1,30 @@
+valence-ffmpeg (8.1.3-2.1) unstable; urgency=medium
+
+  * Merged jellyfin-ffmpeg 8.1.3-1 and 8.1.3-2, the two entries below this
+    one: FFmpeg 8.1.3, steadier MSDK hwupload on Windows, updated Vulkan
+    backports, the SVT-AV1 fix for Windows Server/LTSC 2016, and
+    VideoToolbox no longer failing on H.264 streams that carry closed
+    captions in more than one SEI.
+  * dav1d 1.5.4, SVT-AV1 4.2.0, gmmlib 22.10.2, oneVPL GPU runtime and
+    iHD media driver 26.3.5, as upstream. The iHD fix for Xe KMD on
+    small-BAR systems is in 26.3.5, so our copy of it is gone.
+
+ -- Valence <noreply@valence.dev>  Mon, 19 Oct 2026 12:00:00 +0100
+
+jellyfin-ffmpeg (8.1.3-2) unstable; urgency=medium
+
+  * Fix SVT-AV1 regression on legacy Windows versions (Server/LTSC 2016)
+
+ -- nyanmisaka <nst799610810@gmail.com>  Thu, 8 Oct 2026 13:31:45 +0800
+
+jellyfin-ffmpeg (8.1.3-1) unstable; urgency=medium
+
+  * New upstream version 8.1.3
+  * Fix instability when using MSDK for hwupload on Windows
+  * Update backported vulkan fixes from upstream
+
+ -- nyanmisaka <nst799610810@gmail.com>  Tue, 22 Sep 2026 20:34:13 +0800
+
 valence-ffmpeg (8.1.2-5.5) unstable; urgency=medium
 
   * Publish a Windows on Arm build again (winarm64), for Valence's
