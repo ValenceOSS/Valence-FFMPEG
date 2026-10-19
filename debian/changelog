@@ -8,6 +8,9 @@ valence-ffmpeg (8.1.3-2.1) unstable; urgency=medium
   * dav1d 1.5.4, SVT-AV1 4.2.0, gmmlib 22.10.2, oneVPL GPU runtime and
     iHD media driver 26.3.5, as upstream. The iHD fix for Xe KMD on
     small-BAR systems is in 26.3.5, so our copy of it is gone.
+  * Use a Dolby Vision scene's L0 peak when its L1 peak is so low that the
+    GPU tone mappers would turn it black (patch 9002), from jellyfin-ffmpeg's
+    unmerged Dolby Vision enhancement-layer branch, without the rest of it.
 
  -- Valence <noreply@valence.dev>  Mon, 19 Oct 2026 12:00:00 +0100
 
