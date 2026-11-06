@@ -99,5 +99,10 @@
 0099-fix-qsv-av1-decoder-exporting-hdr-side-data.patch
 0100-backport-trim-bitstream-filter.patch
 0101-fix-videotoolbox-closed-caption-sei.patch
+0102-fix-sse2-scene-sad-unaligned-input.patch
+0103-backport-a-fix-for-pts-overflow-in-deint-vaapi-filter.patch
+0104-backport-a-fix-for-data-race-with-frame-threading-in-dxva.patch
+0105-skip-oversized-a53-caption-sei-in-qsv-h264-encoder.patch
+0106-unref-the-last-frame-on-filter-graph-cleanup.patch
 9001-keep-a-keyframes-display-time-when-movenc-nudges-its-decode-time.patch
 9002-use-a-dolby-vision-scenes-l0-peak-when-its-l1-peak-is-too-dark.patch
