@@ -104,12 +104,20 @@ cache_key() {
 
 # Downloads a URL to a file, retrying, and says so when it cannot.
 #
+#   fetch <url> <target> [fallback-url...]
+#
 # `--retry-on-http-error` is the important part: wget does not treat a 503 as
 # worth retrying unless told, and 503 and 429 are exactly what a busy or
 # rate-limiting host answers with.
+#
+# Fallbacks are for sources that more than one host carries. ftpmirror.gnu.org
+# redirects every request from one place to the same mirror, so retrying it
+# retries a mirror that is down; a fallback goes somewhere else. The cache is
+# keyed on the first URL, whichever one served the file.
 fetch() {
     local url="$1"
     local target="$2"
+    shift 2
     local cached="${SOURCE_CACHE}/tarballs/$(cache_key "${url}")"
 
     if cache_ready && [[ -s "${cached}" ]]; then
@@ -118,16 +126,25 @@ fetch() {
         return 0
     fi
 
-    wget \
-        --tries=${FETCH_TRIES} \
-        --waitretry=${FETCH_WAIT} \
-        --timeout=60 \
-        --retry-connrefused \
-        --retry-on-host-error \
-        --retry-on-http-error=408,429,500,502,503,504 \
-        -nv \
-        -O "${target}" \
-        "${url}" || return 1
+    local source
+    local fetched=0
+    for source in "${url}" "$@"; do
+        if wget \
+            --tries=${FETCH_TRIES} \
+            --waitretry=${FETCH_WAIT} \
+            --timeout=60 \
+            --retry-connrefused \
+            --retry-on-host-error \
+            --retry-on-http-error=408,429,500,502,503,504 \
+            -nv \
+            -O "${target}" \
+            "${source}"; then
+            fetched=1
+            break
+        fi
+        echo "fetch: ${source} failed" >&2
+    done
+    [[ ${fetched} = 1 ]] || return 1
 
     if cache_ready; then
         mkdir -p "${SOURCE_CACHE}/tarballs"
@@ -246,8 +263,10 @@ prepare_extra_common() {
     mkdir iconv
     pushd iconv
     iconv_ver="1.19"
-    iconv_link="https://mirrors.edge.kernel.org/gnu/libiconv/libiconv-${iconv_ver}.tar.gz"
-    fetch ${iconv_link} iconv.tar.gz
+    iconv_link="https://ftpmirror.gnu.org/gnu/libiconv/libiconv-${iconv_ver}.tar.gz"
+    fetch ${iconv_link} iconv.tar.gz \
+        "https://ftp.gnu.org/gnu/libiconv/libiconv-${iconv_ver}.tar.gz" \
+        "https://mirrors.edge.kernel.org/gnu/libiconv/libiconv-${iconv_ver}.tar.gz"
     tar xaf iconv.tar.gz
     pushd libiconv-${iconv_ver}
     ./configure \
@@ -507,7 +526,7 @@ prepare_extra_common() {
 
     # SVT-AV1
     pushd ${SOURCE_DIR}
-    clone v4.2.0-cqp-extended https://gitlab.com/AOMediaCodec/SVT-AV1.git
+    clone v4.3.0 https://gitlab.com/AOMediaCodec/SVT-AV1.git
     pushd SVT-AV1
     mkdir build
     pushd build
@@ -899,6 +918,8 @@ prepare_extra_amd64() {
     pushd media-driver
     # Enable VC1 decode on DG2 (note that MTL+ is not supported)
     apply_local_patch media-driver/e47702f.patch git apply
+    # Fix use-after-free when DestroyContext races StatusCheck (MTL+ only)
+    apply_local_patch media-driver/576fd26.patch git apply
     mkdir build && pushd build
     cmake -DCMAKE_INSTALL_PREFIX=${TARGET_DIR} \
           -DCMAKE_C_FLAGS="${CFLAGS} -Wno-error=array-bounds" \
